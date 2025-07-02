@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sparkles, CalendarDays, PhoneCall } from 'lucide-react';
+import { ArrowRight, Sparkles, CalendarDays, PhoneCall, MapPin, X } from 'lucide-react';
 
 const CallToAction = () => {
   const [isHovered, setIsHovered] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +25,24 @@ const CallToAction = () => {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     });
+  };
+  
+  const handleBookClick = (e) => {
+    e.preventDefault();
+    setShowLocationPopup(true);
+  };
+  
+  const handleLocationClick = (location) => {
+    if (location === 'Chennai') {
+      window.location.href = '/chennai-villas';
+    } else if (location === 'Pondicherry') {
+      window.location.href = '/pondicherry-villas';
+    }
+    setShowLocationPopup(false);
+  };
+  
+  const closePopup = () => {
+    setShowLocationPopup(false);
   };
   
   // Particles for hover effect
@@ -192,6 +211,7 @@ const CallToAction = () => {
           >
             <motion.button 
               className="bg-black text-white py-4 px-8 rounded-lg shadow-lg relative overflow-hidden group z-10 min-w-[200px]"
+              onClick={handleBookClick}
             >
               {/* Background light effect */}
               <motion.div 
@@ -282,6 +302,7 @@ const CallToAction = () => {
           >
             <motion.button 
               className="bg-white border-2 border-black text-charcoal py-4 px-8 rounded-lg shadow-md relative overflow-hidden group z-10 min-w-[200px]"
+              onClick={() => window.location.href = '/contact'}
             >
               {/* Subtle background animation */}
               <motion.div 
@@ -347,6 +368,71 @@ const CallToAction = () => {
           <span className="text-gray-700">500+ satisfied guests</span>
         </motion.div>
       </motion.div>
+      
+      {/* Location Selection Popup */}
+      <AnimatePresence>
+        {showLocationPopup && (
+          <motion.div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closePopup}
+          >
+            <motion.div 
+              className="bg-white rounded-xl shadow-2xl overflow-hidden max-w-md w-full"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 className="text-lg font-serif text-gray-800">Select Your Location</h3>
+                <button 
+                  onClick={closePopup}
+                  className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-5">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <motion.button
+                    className="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleLocationClick('Chennai')}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-3">
+                      <MapPin className="w-6 h-6 text-gray-700" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-800">Chennai</h4>
+                    <p className="text-sm text-gray-500 mt-1 text-center">Explore our luxury villas in Chennai</p>
+                  </motion.button>
+                  
+                  <motion.button
+                    className="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleLocationClick('Pondicherry')}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-3">
+                      <MapPin className="w-6 h-6 text-gray-700" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-800">Pondicherry</h4>
+                    <p className="text-sm text-gray-500 mt-1 text-center">Discover beach-side villas in Pondicherry</p>
+                  </motion.button>
+                </div>
+                
+                <p className="mt-6 text-xs text-gray-400 text-center">
+                  Select a location to browse our available luxury villas
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { PlayCircle, PauseCircle, X, ZoomIn, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { PlayCircle, PauseCircle, X, ZoomIn, ChevronLeft, ChevronRight, Info, Image, Camera, Heart } from 'lucide-react';
 import villaImage from '../../assets/About/advantages-of-living-in-a-villa.jpg';
 import villaVideo from '../../assets/About/v.mp4';
 
@@ -26,23 +26,240 @@ const Gallery = () => {
   // CRT effect ref
   const crtOverlayRef = useRef(null);
 
-  // Sample media items with categories
+  // Premium villa gallery items
   const mediaItems = [
-    { type: 'image', src: villaImage, alt: 'Villa exterior', category: 'exterior' },
-    { type: 'video', src: villaVideo, alt: 'Villa tour', category: 'tour' },
-    { type: 'image', src: villaImage, alt: 'Garden view', category: 'outdoor' },
-    { type: 'image', src: villaImage, alt: 'Master bedroom', category: 'interior' },
-    { type: 'video', src: villaVideo, alt: 'Pool area', category: 'outdoor' },
-    { type: 'image', src: villaImage, alt: 'Dining space', category: 'interior' },
+    // Chennai - Amrith Palace
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP1.jpg', 
+      alt: 'Amrith Palace Villa Front View', 
+      category: 'exterior',
+      featured: true,
+      location: 'Chennai'
+    },
+    { 
+      type: 'video', 
+      src: villaVideo, 
+      alt: 'Luxury Villa Tour', 
+      category: 'tour',
+      featured: true,
+      location: 'Chennai'
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP2.jpg', 
+      alt: 'Premium Infinity Pool', 
+      category: 'outdoor',
+      featured: true,
+      location: 'Chennai'
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP3.jpg', 
+      alt: 'Master Suite with Ocean View', 
+      category: 'interior',
+      featured: false,
+      location: 'Chennai' 
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP4.jpg', 
+      alt: 'Gourmet Kitchen', 
+      category: 'interior',
+      featured: false,
+      location: 'Chennai' 
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP5.jpg', 
+      alt: 'Spacious Living Area', 
+      category: 'interior',
+      featured: false,
+      location: 'Chennai'
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP10.jpg', 
+      alt: 'Luxurious Bedroom Suite', 
+      category: 'interior',
+      featured: true,
+      location: 'Chennai'
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP15.jpg', 
+      alt: 'Elegant Bathroom', 
+      category: 'interior',
+      featured: false,
+      location: 'Chennai'
+    },
+    { 
+      type: 'image', 
+      src: '/AmrithPalace/AP20.jpg', 
+      alt: 'Modern Entertainment Area', 
+      category: 'interior',
+      featured: true,
+      location: 'Chennai'
+    },
+    
+    // Pondicherry - Lavish Villa 1
+    { 
+      type: 'image', 
+      src: '/LavishVilla 1/lvone1.jpg', 
+      alt: 'Lavish Villa 1 Entrance', 
+      category: 'exterior',
+      featured: false,
+      location: 'Pondicherry' 
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 1/lvone2.jpg', 
+      alt: 'Private Garden Terrace', 
+      category: 'outdoor',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 1/lvone3.jpg', 
+      alt: 'Luxury Dining Experience', 
+      category: 'interior',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 1/lvone10.jpg', 
+      alt: 'Spacious Living Room', 
+      category: 'interior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 1/lvone15.jpg', 
+      alt: 'Premium Bedroom', 
+      category: 'interior',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    
+    // Pondicherry - Lavish Villa 2
+    { 
+      type: 'image', 
+      src: '/LavishVilla 2/lvtwo1.jpg', 
+      alt: 'Lavish Villa 2 Exterior', 
+      category: 'exterior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 2/lvtwo5.jpg', 
+      alt: 'Villa 2 Poolside', 
+      category: 'outdoor',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 2/lvtwo10.jpg', 
+      alt: 'Luxurious Lounge', 
+      category: 'interior',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    
+    // Pondicherry - Lavish Villa 3
+    { 
+      type: 'image', 
+      src: '/LavishVilla 3/lvthree1.jpg', 
+      alt: 'Lavish Villa 3 Front View', 
+      category: 'exterior',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/LavishVilla 3/lvthree10.jpg', 
+      alt: 'Villa 3 Lounge Area', 
+      category: 'interior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    
+    // Pondicherry - East Coast Villa
+    { 
+      type: 'image', 
+      src: '/eastcoastvilla/EC1.jpg', 
+      alt: 'East Coast Villa View', 
+      category: 'exterior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/eastcoastvilla/EC2.jpg', 
+      alt: 'Beachfront Relaxation Area', 
+      category: 'outdoor',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/eastcoastvilla/EC3.jpg', 
+      alt: 'Designer Bathroom', 
+      category: 'interior',
+      featured: false,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/eastcoastvilla/EC10.jpg', 
+      alt: 'Beach View Suite', 
+      category: 'interior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    
+    // Pondicherry - Empire Anand Villa
+    { 
+      type: 'image', 
+      src: '/empireanandvillasamudra/anandvilla1.jpg', 
+      alt: 'Anand Villa Exterior', 
+      category: 'exterior',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/empireanandvillasamudra/anandvilla5.jpg', 
+      alt: 'Anand Villa Garden', 
+      category: 'outdoor',
+      featured: true,
+      location: 'Pondicherry'
+    },
+    { 
+      type: 'image', 
+      src: '/empireanandvillasamudra/anandvilla10.jpg', 
+      alt: 'Anand Villa Living Room', 
+      category: 'interior',
+      featured: false,
+      location: 'Pondicherry'
+    }
   ];
 
-  // Filter categories from media items
+  // Enhanced filter categories
   const categories = ['all', 'exterior', 'interior', 'outdoor', 'tour'];
+  const locations = ['all', 'Chennai', 'Pondicherry'];
+  const [activeLocation, setActiveLocation] = useState('all');
 
-  // Filtered items based on selected category
-  const filteredItems = filterCategory === 'all'
-    ? mediaItems
-    : mediaItems.filter(item => item.category === filterCategory);
+  // Filtered items based on selected category and location
+  const filteredItems = mediaItems.filter(item => {
+    const categoryMatch = filterCategory === 'all' || item.category === filterCategory;
+    const locationMatch = activeLocation === 'all' || item.location === activeLocation;
+    return categoryMatch && locationMatch;
+  });
 
   // Track scroll position for parallax effects
   useEffect(() => {
@@ -148,14 +365,16 @@ const Gallery = () => {
     // }
   };
   
-  const handleMouseLeave = (index) => {
+  const handleMouseLeave = () => {
     setHoveredItem(null);
     
     // Auto-pause on mouse leave (optional)
-    // const video = videoRefs.current[index];
-    // if (mediaItems[index].type === 'video' && video && !video.paused) {
-    //   video.pause();
-    //   setPlayingStates(prev => ({ ...prev, [index]: false }));
+    // if (hoveredItem !== null) {
+    //   const video = videoRefs.current[hoveredItem];
+    //   if (mediaItems[hoveredItem]?.type === 'video' && video && !video.paused) {
+    //     video.pause();
+    //     setPlayingStates(prev => ({ ...prev, [hoveredItem]: false }));
+    //   }
     // }
   };
   
@@ -425,10 +644,19 @@ const Gallery = () => {
           }}
         />
         
-        {/* Title section with animated underline */}
+        {/* Premium title section with animated underline */}
         <motion.div className="text-center mb-10 relative z-10" variants={titleVariants}>
-          <motion.h2 className="text-3xl sm:text-4xl font-serif text-charcoal mb-4 inline-block relative">
-            Our Gallery
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="uppercase text-xs tracking-wider text-gray-500 font-semibold mb-2"
+          >
+            Luxor Holiday Home Stays
+          </motion.div>
+          
+          <motion.h2 className="text-3xl sm:text-5xl font-serif text-charcoal mb-4 inline-block relative">
+            Premium Villa Gallery
             <motion.div
               className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-[2px] bg-gradient-to-r from-transparent via-charcoal to-transparent"
               initial={{ width: "0%" }}
@@ -443,51 +671,305 @@ const Gallery = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Explore our luxurious villa through these stunning visuals. Click on any item to view in full screen.
+            Explore our exclusive collection of luxury villas in Chennai and Pondicherry. 
+            Each property is carefully designed to provide unparalleled comfort and elegance.
+            Click on any image to view in full screen and immerse yourself in the exquisite details.
           </motion.p>
         </motion.div>
         
-        {/* Filter categories */}
-        <motion.div 
-          className="flex flex-wrap justify-center gap-4 mb-8"
-          variants={filterVariants}
-        >
-          {categories.map((category, index) => (
-            <motion.button
-              key={category}
-              variants={filterItemVariants}
-              custom={index}
-              animate={filterCategory === category ? "active" : "inactive"}
-              whileHover="hover"
-              whileTap="tap"
-              onClick={() => setFilterCategory(category)}
-              className={`px-4 py-2 rounded-full border transition-all duration-300 text-sm ${
-                filterCategory === category 
-                ? 'border-charcoal bg-charcoal/5' 
-                : 'border-gray-200 hover:border-gray-300'
-              }`}
+        {/* Filter sections */}
+        <div className="mb-8">
+          {/* Location filters */}
+          <motion.div 
+            className="mb-4 text-center"
+            variants={filterVariants}
+          >
+            <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-3">Choose Location</h3>
+            <div className="flex flex-wrap justify-center gap-4">
+              {locations.map((location, index) => (
+                <motion.button
+                  key={location}
+                  variants={filterItemVariants}
+                  custom={index}
+                  animate={activeLocation === location ? "active" : "inactive"}
+                  whileHover="hover"
+                  whileTap="tap"
+                  onClick={() => setActiveLocation(location)}
+                  className={`px-4 py-2 rounded-full transition-all duration-300 text-sm ${
+                    activeLocation === location 
+                    ? 'bg-charcoal text-white shadow-md' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {location}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+          
+          {/* Category filters */}
+          <motion.div 
+            className="flex flex-wrap justify-center gap-4"
+            variants={filterVariants}
+          >
+            {categories.map((category, index) => (
+              <motion.button
+                key={category}
+                variants={filterItemVariants}
+                custom={index}
+                animate={filterCategory === category ? "active" : "inactive"}
+                whileHover="hover"
+                whileTap="tap"
+                onClick={() => setFilterCategory(category)}
+                className={`px-4 py-2 rounded-full border transition-all duration-300 text-sm ${
+                  filterCategory === category 
+                  ? 'border-charcoal bg-charcoal/5' 
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </motion.button>
+            ))}
+          </motion.div>
+        </div>
+        
+        {/* Featured Section - if any featured items exist */}
+        {filteredItems.some(item => item.featured) && (
+          <motion.div className="mb-12" variants={containerVariants}>
+            <motion.h3 
+              className="text-2xl font-serif text-charcoal mb-6 relative inline-block"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
             >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </motion.button>
-          ))}
+              Featured Properties
+              <motion.div
+                className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-charcoal to-transparent"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+              />
+            </motion.h3>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
+              variants={containerVariants}
+            >
+              {filteredItems.filter(item => item.featured).slice(0, 2).map((item, index) => (
+                <motion.div 
+                  key={`featured-${index}`}
+                  className="h-80 md:h-96 overflow-hidden rounded-xl relative group cursor-pointer"
+                  variants={itemVariants}
+                  custom={index}
+                  whileHover="hover"
+                  whileTap="tap"
+                  onClick={() => openModal(mediaItems.indexOf(item))}
+                  onMouseEnter={() => handleMouseEnter(mediaItems.indexOf(item))}
+                  onMouseLeave={() => handleMouseLeave()}
+                  style={{
+                    transformOrigin: 'center',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                    backgroundColor: '#f8f8f8',
+                  }}
+                >
+                  {/* Item content (image or video) */}
+                  {item.type === 'image' ? (
+                    <motion.img 
+                      src={item.src} 
+                      alt={item.alt} 
+                      className="w-full h-full object-cover transition-transform duration-1500 ease-out"
+                      initial={{ scale: 1.1, filter: 'grayscale(40%)' }}
+                      animate={{ 
+                        scale: hoveredItem === mediaItems.indexOf(item) ? 1.05 : 1,
+                        filter: hoveredItem === mediaItems.indexOf(item) ? 'grayscale(0%)' : 'grayscale(20%)'
+                      }}
+                      transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                    />
+                  ) : (
+                    <div className="w-full h-full relative overflow-hidden">
+                      <motion.video
+                        ref={el => videoRefs.current[mediaItems.indexOf(item)] = el}
+                        src={item.src}
+                        className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
+                          playingStates[mediaItems.indexOf(item)] ? '' : 'grayscale'
+                        }`}
+                        muted
+                        loop
+                        playsInline
+                        initial={{ scale: 1.1 }}
+                        animate={{ 
+                          scale: hoveredItem === mediaItems.indexOf(item) || playingStates[mediaItems.indexOf(item)] ? 1.05 : 1
+                        }}
+                        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                        onClick={(e) => e.preventDefault()}
+                      />
+                      
+                      {/* Play button overlay with improved animation */}
+                      <motion.button
+                        onClick={(e) => toggleVideoPlay(mediaItems.indexOf(item), e)}
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+                        initial={{ opacity: 0.8 }}
+                        whileHover={{ 
+                          scale: 1.1, 
+                          opacity: 1,
+                          boxShadow: "0 0 20px rgba(255,255,255,0.5)" 
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                      >
+                        <motion.div
+                          className="relative flex items-center justify-center"
+                          animate={{
+                            rotate: playingStates[mediaItems.indexOf(item)] ? 0 : 0,
+                          }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          {playingStates[mediaItems.indexOf(item)] ? (
+                            <PauseCircle className="w-14 h-14 text-white drop-shadow-lg" />
+                          ) : (
+                            <PlayCircle className="w-14 h-14 text-white drop-shadow-lg" />
+                          )}
+                          
+                          {/* Animated ring around play button */}
+                          <motion.div
+                            className="absolute -inset-1 rounded-full border-2 border-white/50"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{
+                              scale: [0.8, 1.2, 0.8],
+                              opacity: [0, 0.5, 0],
+                            }}
+                            transition={{
+                              repeat: Infinity,
+                              duration: 2,
+                            }}
+                          />
+                        </motion.div>
+                      </motion.button>
+                    </div>
+                  )}
+                  
+                  {/* Featured badge */}
+                  <div className="absolute top-4 right-4 bg-white/90 text-charcoal px-3 py-1 rounded-full text-xs font-medium shadow-md">
+                    Featured
+                  </div>
+                  
+                  {/* Overlay gradient */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: hoveredItem === mediaItems.indexOf(item) ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  
+                  {/* Location badge */}
+                  <div className="absolute top-4 left-4 bg-charcoal/80 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs">
+                    {item.location}
+                  </div>
+                  
+                  {/* Item info */}
+                  <motion.div 
+                    className="absolute bottom-0 left-0 w-full p-6 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ 
+                      opacity: hoveredItem === mediaItems.indexOf(item) ? 1 : 0,
+                      y: hoveredItem === mediaItems.indexOf(item) ? 0 : 20
+                    }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  >
+                    <motion.h3 
+                      className="text-xl font-medium"
+                      initial={{ y: 10 }}
+                      animate={{ y: 0 }}
+                      transition={{ delay: 0.1, duration: 0.4 }}
+                    >
+                      {item.alt}
+                    </motion.h3>
+                    
+                    <motion.div 
+                      className="text-sm text-white/80 mt-2 flex items-center gap-2"
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                    >
+                      <span className="capitalize">{item.category}</span>
+                      <span className="w-1 h-1 bg-white/70 rounded-full" />
+                      <span>{item.type === 'video' ? 'Video' : 'Photo'}</span>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Main Gallery Grid */}
+        <motion.div className="mb-6" variants={containerVariants}>
+          <div className="flex items-center justify-between mb-6">
+            <motion.h3 
+              className="text-xl font-serif text-charcoal relative inline-block"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              All Properties
+              <motion.div
+                className="absolute bottom-0 left-0 h-[1px] bg-gradient-to-r from-charcoal to-transparent"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+              />
+            </motion.h3>
+            
+            <motion.div 
+              className="bg-gray-100 px-3 py-1 rounded-full text-sm text-gray-600"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            >
+              {filteredItems.length} properties found
+            </motion.div>
+          </div>
         </motion.div>
         
-        {/* Gallery grid */}
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          variants={containerVariants}
-        >
-          {filteredItems.map((item, index) => (
+        {/* Gallery grid with empty state */}
+        {filteredItems.length === 0 ? (
+          <motion.div 
+            className="py-16 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="mb-6 inline-block p-4 rounded-full bg-gray-100">
+              <Image className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">No properties found</h3>
+            <p className="text-gray-500 mb-6">Try changing your filters to see more results</p>
+            <button 
+              onClick={() => { 
+                setFilterCategory('all'); 
+                setActiveLocation('all');
+              }}
+              className="px-6 py-2 bg-charcoal text-white rounded-full hover:bg-charcoal/90 transition-colors"
+            >
+              Reset filters
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+            variants={containerVariants}
+          >
+            {filteredItems.map((item, index) => (
             <motion.div 
               key={index} 
-              className="h-64 md:h-80 overflow-hidden rounded-xl relative group cursor-pointer"
+              className="h-64 md:h-72 overflow-hidden rounded-xl relative group cursor-pointer"
               variants={itemVariants}
               custom={index}
               whileHover="hover"
               whileTap="tap"
               onClick={() => openModal(mediaItems.indexOf(item))}
               onMouseEnter={() => handleMouseEnter(mediaItems.indexOf(item))}
-              onMouseLeave={() => handleMouseLeave(mediaItems.indexOf(item))}
+              onMouseLeave={() => handleMouseLeave()}
               style={{
                 transformOrigin: 'center',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
@@ -641,9 +1123,10 @@ const Gallery = () => {
             </motion.div>
           ))}
         </motion.div>
+        )}
       </motion.div>
       
-      {/* Fullscreen modal */}
+      {/* Premium fullscreen modal */}
       <AnimatePresence>
         {selectedItem !== null && (
           <motion.div 
@@ -662,24 +1145,62 @@ const Gallery = () => {
               <X className="w-8 h-8" />
             </motion.button>
             
+            {/* Decorative elements */}
             <motion.div 
-              className="relative max-w-5xl max-h-[80vh] w-full"
+              className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.3, 0.1] }}
+              transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
+            />
+            
+            <motion.div 
+              className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-white/5 blur-3xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.2, 0.05] }}
+              transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", delay: 1 }}
+            />
+            
+            <motion.div 
+              className="relative max-w-6xl max-h-[85vh] w-full"
               variants={modalVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
+              {/* Location badge */}
+              <motion.div 
+                className="absolute top-4 left-4 z-20 bg-white/10 backdrop-blur-md px-4 py-1 rounded-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-white/80"></div>
+                  <span className="text-white text-sm">{mediaItems[selectedItem].location}</span>
+                </div>
+              </motion.div>
+              
               {mediaItems[selectedItem].type === 'image' ? (
-                <motion.img 
-                  src={mediaItems[selectedItem].src} 
-                  alt={mediaItems[selectedItem].alt}
-                  className="w-full h-full object-contain rounded-lg shadow-2xl"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                />
+                <div className="relative overflow-hidden rounded-xl shadow-2xl">
+                  <motion.img 
+                    src={mediaItems[selectedItem].src} 
+                    alt={mediaItems[selectedItem].alt}
+                    className="w-full h-full object-contain"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                  />
+                  
+                  {/* Premium overlay effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                  />
+                </div>
               ) : (
-                <div className="relative w-full aspect-video overflow-hidden rounded-lg shadow-2xl">
+                <div className="relative w-full aspect-video overflow-hidden rounded-xl shadow-2xl">
                   <video
                     ref={modalVideoRef}
                     src={mediaItems[selectedItem].src}
@@ -716,21 +1237,47 @@ const Gallery = () => {
                 </div>
               )}
               
-              {/* Image/video info */}
+              {/* Enhanced image/video info */}
               <motion.div 
-                className="bg-white/10 backdrop-blur-md text-white p-4 rounded-lg mt-4"
+                className="bg-white/10 backdrop-blur-md text-white p-6 rounded-xl mt-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-medium">{mediaItems[selectedItem].alt}</h3>
-                  <span className="px-3 py-1 rounded-full bg-white/20 text-xs capitalize">
-                    {mediaItems[selectedItem].category}
-                  </span>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      {mediaItems[selectedItem].featured && (
+                        <span className="bg-white text-charcoal px-2 py-0.5 rounded text-xs font-medium">
+                          Featured
+                        </span>
+                      )}
+                      <span className="px-3 py-1 rounded-full bg-white/20 text-xs capitalize">
+                        {mediaItems[selectedItem].category}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-medium">{mediaItems[selectedItem].alt}</h3>
+                    <div className="flex items-center gap-2 text-white/70 text-sm mt-2">
+                      <Camera className="w-4 h-4" />
+                      <span>{mediaItems[selectedItem].type === 'video' ? 'Premium Video Tour' : 'High Resolution Photo'}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="ml-auto">
+                    <motion.button
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-charcoal"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Heart className="w-4 h-4" />
+                      <span className="text-sm font-medium">Book This Villa</span>
+                    </motion.button>
+                  </div>
                 </div>
-                <p className="text-white/70 text-sm mt-2">
-                  Experience the luxury and elegance of our exquisite villa, designed for comfort and sophistication.
+                
+                <p className="text-white/80 text-sm mt-4 border-t border-white/10 pt-4">
+                  Experience the luxury and elegance of our exquisite {mediaItems[selectedItem].location} villa, 
+                  designed for comfort and sophistication. Each property is carefully curated to provide an unforgettable stay.
                 </p>
               </motion.div>
               

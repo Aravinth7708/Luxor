@@ -322,7 +322,7 @@ const PersonalIntro = () => {
                             animate={isVisible ? { opacity: 1, x: 0 } : {}}
                             transition={{ duration: 0.8, delay: 1.2 }}
                         >
-                            Jonathan Miller
+                            Gunaseelan
                         </motion.div>
                         <motion.span 
                             className="text-gray-500 text-sm uppercase tracking-wider"

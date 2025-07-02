@@ -1,40 +1,40 @@
 
-import React, { useEffect, useRef } from 'react';
-import { FaHome, FaUsers, FaTools, FaAward } from 'react-icons/fa';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { FaBuilding, FaBusinessTime, FaCertificate, FaUsers } from 'react-icons/fa';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 
 const milestones = [
   {
-    date: '2020',
-    text: 'Villa Established',
-    icon: <FaHome size={28} />,
+    date: 'April 1, 2024',
+    text: 'Business Incorporation',
+    icon: <FaBuilding size={28} />,
     bgImage:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80', // house-themed
-    description: 'Our luxurious villa opened its doors to welcome guests to an unforgettable experience of comfort and elegance.'
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80', // business-themed
+    description: 'Luxor Holiday Home Stays was officially registered as a business entity under UDYAM certification.'
   },
   {
-    date: '2021',
-    text: 'First Guests Arrived',
+    date: 'April 1, 2024',
+    text: 'Commencement of Business',
+    icon: <FaBusinessTime size={28} />,
+    bgImage:
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80', // business operations themed
+    description: 'We officially began our business operations, opening our doors to welcome guests to our luxury accommodations.'
+  },
+  {
+    date: 'February 17, 2025',
+    text: 'Udyam Certificate Issued',
+    icon: <FaCertificate size={28} />,
+    bgImage:
+      'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80', // certificate-themed
+    description: 'Our official Udyam certificate was issued, recognizing Luxor Holiday Home Stays as a Micro Enterprise in the Accommodation and Hospitality sector.'
+  },
+  {
+    date: 'Present Day',
+    text: 'Growing Team of Professionals',
     icon: <FaUsers size={28} />,
     bgImage:
-      'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=800&q=80', // people-themed
-    description: 'We were delighted to host our first guests who experienced our exceptional hospitality and amenities.'
-  },
-  {
-    date: '2022',
-    text: 'Renovation Completed',
-    icon: <FaTools size={28} />,
-    bgImage:
-      'https://images.unsplash.com/photo-1581091870624-1e3e64a1b80d?auto=format&fit=crop&w=800&q=80', // tools-themed
-    description: 'Our villa underwent a complete transformation, adding modern features while preserving its authentic charm.'
-  },
-  {
-    date: '2023',
-    text: 'Awarded Best Villa',
-    icon: <FaAward size={28} />,
-    bgImage:
-      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80', // award-themed
-    description: 'Our commitment to excellence was recognized with the prestigious "Best Villa" award in the luxury accommodation category.'
+      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80', // team-themed
+    description: 'Today, we proudly employ a dedicated team of 8 professionals (6 male and 2 female staff) committed to providing exceptional service to our guests.'
   },
 ];
 
@@ -99,16 +99,44 @@ const Timeline = () => {
         style={{ y: backgroundY }}
       />
       
-      <motion.h2 
+      <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.2 }}
-        className="relative text-5xl font-serif text-black text-center mb-20 tracking-wide drop-shadow-sm z-10"
+        className="relative z-10 px-4 sm:px-6 mb-20"
       >
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-black to-gray-700">
-          Our Journey
-        </span>
-      </motion.h2>
+        <h2 className="text-4xl md:text-5xl font-serif text-black text-center tracking-wide drop-shadow-sm mb-6">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-black to-gray-700">
+            Our Journey
+          </span>
+        </h2>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="max-w-4xl mx-auto bg-white/70 backdrop-blur-sm p-5 md:p-6 rounded-xl shadow-md border border-gray-100"
+        >
+          <h3 className="text-xl font-medium text-gray-800 mb-3 text-center md:text-left">Business Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+            <div>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Business Name:</span> Luxor Holiday Home Stays</p>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Owner:</span> Gunaseelan</p>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Enterprise Type:</span> Micro</p>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Registered as:</span> Proprietorship</p>
+            </div>
+            <div>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Major Activity:</span> Services</p>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Social Category:</span> OBC</p>
+              <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Employees:</span> 8 (6 Male, 2 Female)</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <p className="text-gray-700 text-sm md:text-base"><span className="font-medium">Address:</span> 6/181, Dargah Road, Kovalam Main Road, Kovalam Village, 
+              Thiruporur Taluk, Chengalpattu, Tamil Nadu – 603112</p>
+          </div>
+        </motion.div>
+      </motion.div>
 
       <div className="relative max-w-5xl mx-auto z-10">
         {/* Animated vertical timeline line */}
@@ -140,6 +168,7 @@ const Timeline = () => {
 const MilestoneItem = ({ milestone, isLeft, index }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, margin: "-100px 0px" });
+  const [isHovered, setIsHovered] = useState(false);
   
   // Animation variants
   const cardVariants = {
@@ -173,6 +202,14 @@ const MilestoneItem = ({ milestone, isLeft, index }) => {
       }
     }
   };
+  
+  // Industry codes (only shown for certificate milestone)
+  const industryCodes = index === 2 ? [
+    { code: "55109", name: "Accommodation (Holiday Homes / Private Guest Houses)" },
+    { code: "56101", name: "Restaurants without Bars" },
+    { code: "56210", name: "Event Catering" },
+    { code: "79900", name: "Travel Services" }
+  ] : null;
 
   return (
     <div
@@ -185,6 +222,8 @@ const MilestoneItem = ({ milestone, isLeft, index }) => {
         variants={cardVariants}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={`w-full md:w-5/12 p-6 md:p-8 rounded-[2rem] border border-black/10 shadow-lg backdrop-blur-sm
           text-${isLeft ? 'right' : 'left'} relative cursor-pointer
           transition-all duration-500 ease-out hover:shadow-xl
@@ -205,14 +244,39 @@ const MilestoneItem = ({ milestone, isLeft, index }) => {
         <div className="relative z-10">
           <p className="text-gray-700 text-sm font-mono mb-2 md:mb-3">{milestone.date}</p>
           <p className="text-black font-semibold text-xl md:text-2xl leading-relaxed mb-3">{milestone.text}</p>
-          <motion.p 
-            initial={{ opacity: 0, height: 0 }}
-            whileInView={{ opacity: 1, height: "auto" }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="text-black/80 text-sm md:text-base leading-relaxed hidden md:block"
-          >
-            {milestone.description}
-          </motion.p>
+          
+          {/* Description or industry codes */}
+          <AnimatePresence mode="wait">
+            {index === 2 && isHovered ? (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm border border-black/5 mt-2 hidden md:block"
+              >
+                <p className="text-black font-semibold text-sm mb-1">Industry Codes:</p>
+                <ul className="space-y-1">
+                  {industryCodes.map((industry, idx) => (
+                    <li key={idx} className="text-gray-800 text-xs flex items-start">
+                      <span className="font-medium mr-1">{industry.code}</span>
+                      <span>- {industry.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ) : (
+              <motion.p 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="text-black/80 text-sm md:text-base leading-relaxed hidden md:block"
+              >
+                {milestone.description}
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
@@ -231,9 +295,28 @@ const MilestoneItem = ({ milestone, isLeft, index }) => {
         <div className="text-black z-10 drop-shadow-md">{milestone.icon}</div>
       </motion.div>
       
-      {/* Date indicator for mobile */}
-      <div className="md:hidden text-center text-lg font-bold py-3">
-        {milestone.date}
+      {/* Date indicator and info for mobile */}
+      <div className="md:hidden space-y-2 text-center py-3">
+        <div className="text-lg font-bold">{milestone.date}</div>
+        
+        {index === 2 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm border border-black/5 mx-3 mt-2"
+          >
+            <p className="text-black font-semibold text-sm mb-2">Industry Codes:</p>
+            <ul className="space-y-2 text-left">
+              {industryCodes && industryCodes.map((industry, idx) => (
+                <li key={idx} className="text-gray-800 text-xs flex items-start">
+                  <span className="font-medium min-w-[55px] mr-1">{industry.code}</span>
+                  <span>- {industry.name}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
       </div>
     </div>
   );

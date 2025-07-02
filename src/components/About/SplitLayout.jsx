@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { FaUsers, FaGift, FaHeart, FaAngleDown, FaMapMarkerAlt, FaRegClock, FaRegStar } from "react-icons/fa";
-import villaImage from "../../assets/About/advantages-of-living-in-a-villa.jpg";
+import villaImage from "../../assets/About/anandvilla1.jpg";
 
 const SplitLayout = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -106,21 +106,24 @@ const SplitLayout = () => {
         >
           <img
             src={villaImage}
-            alt="Luxury Villa Experience"
+            alt="Luxurious Villa with Pool at Night"
             className="w-full h-full object-cover transition-all duration-1000"
-            style={{ transformStyle: "preserve-3d" }}
+            style={{ 
+              transformStyle: "preserve-3d",
+              objectPosition: "center center"
+            }}
           />
           
-          {/* Multi-layered overlays */}
+          {/* Multi-layered overlays optimized for night pool image */}
           <motion.div 
-            className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-black/10 pointer-events-none mix-blend-overlay"
+            className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-blue-900/10 pointer-events-none mix-blend-soft-light"
             variants={overlayVariants}
             initial="hidden"
             animate={isHovered ? "hidden" : "visible"}
           />
           
           <motion.div 
-            className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/20 pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-tr from-blue-900/20 via-transparent to-cyan-400/10 pointer-events-none mix-blend-overlay"
             variants={overlayVariants}
             initial="hidden"
             animate={isHovered ? "visible" : "hidden"}
@@ -140,8 +143,8 @@ const SplitLayout = () => {
               <FaMapMarkerAlt className="text-white text-sm" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm">Luxury Location</h3>
-              <p className="text-xs text-gray-600">Premium Villa Experience</p>
+              <h3 className="font-semibold text-sm">Private Pool Villa</h3>
+              <p className="text-xs text-gray-600">Premium Luxury Experience</p>
             </div>
           </div>
         </motion.div>
