@@ -949,111 +949,6 @@ const AllRooms = () => {
                 backdropFilter: 'blur(10px)'
               }}
             >
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold flex items-center gap-3 group">
-                  <div className="p-3 bg-black rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-900 font-bold">
-                    Filters
-                  </span>
-                </h2>
-                <button
-                  onClick={clearFilters}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-black 
-                    border border-gray-300 hover:border-black rounded-xl hover:bg-gray-50 
-                    transition-all duration-300 transform hover:scale-105 active:scale-95"
-                >
-                  Clear All
-                </button>
-              </div>
-
-              {/* Price Filter with Clean Design */}
-              <div className="mb-6 group">
-                <div className="bg-white rounded-xl p-6 border border-gray-200 hover:border-black 
-                  hover:shadow-lg transition-all duration-300">
-                  <button
-                    onClick={() => setShowPriceFilter(!showPriceFilter)}
-                    className="flex items-center justify-between w-full text-left font-semibold text-gray-900"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-black rounded-lg">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                        </svg>
-                      </div>
-                      <span className="text-lg">Price Per Night</span>
-                    </div>
-                    <div className={`transform transition-all duration-300 ${
-                      showPriceFilter ? 'rotate-180' : ''
-                    }`}>
-                      <ChevronDown className="h-5 w-5 text-gray-600" />
-                    </div>
-                  </button>
-
-                  <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                    showPriceFilter ? 'max-h-96 opacity-100 mt-6' : 'max-h-0 opacity-0'
-                  }`}>
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-3 text-gray-500">₹</span>
-                          <input
-                            type="number"
-                            placeholder="0"
-                            value={priceRange[0]}
-                            onChange={(e) => setPriceRange([Number.parseInt(e.target.value) || 0, priceRange[1]])}
-                            className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm
-                              focus:border-black focus:ring-2 focus:ring-gray-200 transition-all duration-300
-                              hover:border-gray-400 bg-white"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-3 text-gray-500">₹</span>
-                          <input
-                            type="number"
-                            placeholder="50,000"
-                            value={priceRange[1]}
-                            onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value) || 50000])}
-                            className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm
-                              focus:border-black focus:ring-2 focus:ring-gray-200 transition-all duration-300
-                              hover:border-gray-400 bg-white"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="relative">
-                      <input
-                        type="range"
-                        min="0"
-                        max="50000"
-                        step="500"
-                        value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider 
-                          accent-black hover:accent-gray-800 transition-all duration-300"
-                        style={{
-                          background: `linear-gradient(to right, #000000 0%, #000000 ${(priceRange[1]/50000)*100}%, #e5e7eb ${(priceRange[1]/50000)*100}%, #e5e7eb 100%)`
-                        }}
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 mt-2">
-                        <span>₹0</span>
-                        <span>₹50,000</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Destination Filter with Clean Design */}
               <div className="mb-6 group">
                 <div className="bg-white rounded-xl p-6 border border-gray-200 hover:border-black 
@@ -1126,14 +1021,14 @@ const AllRooms = () => {
                 </div>
               </div>
 
-              <button
+              {/* <button
                 onClick={applyFilters}
                 className="w-full bg-black text-white py-4 px-6 rounded-xl font-semibold 
                   hover:bg-gray-800 transition-all duration-300 transform hover:scale-[1.02] 
                   active:scale-[0.98] shadow-lg hover:shadow-xl"
               >
                 Apply Filters
-              </button>
+              </button> */}
             </div>
           </div>
 

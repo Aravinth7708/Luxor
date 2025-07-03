@@ -1,31 +1,6 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-
 import {
   Heart,
   ChevronDown,
@@ -53,6 +28,7 @@ import {
   Flame,
   Zap,
   Home,
+  X,
 } from "lucide-react"
 
 import PhotoGallery from "./PhotoGallery"
@@ -142,7 +118,6 @@ import RW8 from "/ramwatervilla/RW8.jpg"
 import RW9 from "/ramwatervilla/RW9.jpg"
 import RW10 from "/ramwatervilla/RW10.jpg"
 import RW11 from "/ramwatervilla/RW11.jpg"
-// import RW12 from "/ramwatervilla/RW12.jpg"
 import RW13 from "/ramwatervilla/RW13.jpg"
 import RW14 from "/ramwatervilla/RW14.jpg"
 import RW15 from "/ramwatervilla/RW15.jpg"
@@ -152,7 +127,6 @@ import RW18 from "/ramwatervilla/RW18.jpg"
 import RW19 from "/ramwatervilla/RW19.jpg"
 
 // LavishVilla 1 (22 images)
-// import lvone1 from "/LavishVilla 1/lvone 1.jpg"
 import lvone2 from "/LavishVilla 1/lvone2.jpg"
 import lvone3 from "/LavishVilla 1/lvone3.jpg"
 import lvone4 from "/LavishVilla 1/lvone4.jpg"
@@ -210,7 +184,6 @@ import lvthree7 from "/LavishVilla 3/lvthree7.jpg"
 import lvthree8 from "/LavishVilla 3/lvthree8.jpg"
 import lvthree9 from "/LavishVilla 3/lvthree9.jpg"
 import lvthree10 from "/LavishVilla 3/lvthree10.jpg"
-// import lvthree11 from "/LavishVilla 3/lvthree11.jpg"
 import lvthree12 from "/LavishVilla 3/lvthree12.jpg"
 import lvthree13 from "/LavishVilla 3/lvthree13.jpg"
 import lvthree14 from "/LavishVilla 3/lvthree14.jpg"
@@ -350,7 +323,6 @@ const villaImageCollections = {
     lvthree8,
     lvthree9,
     lvthree10,
-    // lvthree11,
     lvthree12,
     lvthree13,
     lvthree14,
@@ -472,8 +444,8 @@ const facilityIconMap = {
 }
 
 const VillaDetail = () => {
-  const { id } = useParams() // Get villa ID from URL
-  const location = useLocation() // Get villa data from React Router state
+  const { id } = useParams()
+  const location = useLocation()
   const [villa, setVilla] = useState(location.state?.villa || null)
   const [loading, setLoading] = useState(!location.state?.villa)
   const [error, setError] = useState(null)
@@ -483,18 +455,25 @@ const VillaDetail = () => {
   const [adults, setAdults] = useState(1)
   const [children, setChildren] = useState(0)
   const [infants, setInfants] = useState(0)
-  const [showGuestDropdown, setShowGuestDropdown] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isSaved, setIsSaved] = useState(false)
   const [showPhotoGallery, setShowPhotoGallery] = useState(false)
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date())
-  const [bookingStep, setBookingStep] = useState(1) // 1: Dates, 2: Guests, 3: Contact, 4: Payment, 5: Success
+  const [bookingStep, setBookingStep] = useState(1)
   const [guestDetails, setGuestDetails] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
   })
+
+  // New states for calendar and time selection
+  const [showCheckInCalendar, setShowCheckInCalendar] = useState(false)
+  const [showCheckOutCalendar, setShowCheckOutCalendar] = useState(false)
+  const [showCheckInTime, setShowCheckInTime] = useState(false)
+  const [showCheckOutTime, setShowCheckOutTime] = useState(false)
+  const [checkInTime, setCheckInTime] = useState("12:00 PM")
+  const [checkOutTime, setCheckOutTime] = useState("11:00 AM")
 
   // Remove isSignedIn and user from Clerk
   const { userData, authToken } = useAuth()
@@ -514,6 +493,7 @@ const VillaDetail = () => {
   const [checkInDate, setCheckInDate] = useState("")
   const [checkOutDate, setCheckOutDate] = useState("")
   const [totalDays, setTotalDays] = useState(0)
+  const [totalNights, setTotalNights] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
 
   // Helper function to check if date is weekend
@@ -540,24 +520,30 @@ const VillaDetail = () => {
     return `₹${price}`
   }
 
+  // Calculate nights between dates
+  const calculateNights = (startDate, endDate) => {
+    if (!startDate || !endDate) return 0
+    const timeDiff = endDate.getTime() - startDate.getTime()
+    return Math.ceil(timeDiff / (1000 * 3600 * 24))
+  }
+
   useEffect(() => {
     if (dateRange[0].startDate && dateRange[0].endDate) {
       const startDate = dateRange[0].startDate
       const endDate = dateRange[0].endDate
-      const timeDiff = endDate.getTime() - startDate.getTime()
-      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
+      const nights = calculateNights(startDate, endDate)
 
-      // Fix: Use standardized date formatting to avoid timezone issues
       setCheckInDate(formatDateToYYYYMMDD(startDate))
       setCheckOutDate(formatDateToYYYYMMDD(endDate))
-      setTotalDays(daysDiff)
+      setTotalDays(nights + 1) // Total days including check-in and check-out
+      setTotalNights(nights) // Actual nights stayed
 
       // Calculate total amount based on individual date pricing
       if (villa?.name && villaPricing[villa.name]) {
         let totalPrice = 0
         const currentDate = new Date(startDate)
 
-        for (let i = 0; i < daysDiff; i++) {
+        for (let i = 0; i < nights; i++) {
           totalPrice += getPriceForDate(currentDate, villa.name)
           currentDate.setDate(currentDate.getDate() + 1)
         }
@@ -568,6 +554,7 @@ const VillaDetail = () => {
       }
     } else {
       setTotalDays(0)
+      setTotalNights(0)
       setTotalAmount(0)
     }
   }, [dateRange, villa?.name])
@@ -834,6 +821,7 @@ const VillaDetail = () => {
       },
     ])
     setTotalDays(0)
+    setTotalNights(0)
     setTotalAmount(0)
     setGuestDetails({
       firstName: "",
@@ -866,10 +854,13 @@ const VillaDetail = () => {
         villaName: villa.name,
         checkInDate,
         checkOutDate,
+        checkInTime,
+        checkOutTime,
         adults,
         children,
         infants,
         totalDays,
+        totalNights,
         totalAmount,
         bookingStep,
         // Include the current URL to return to this exact page
@@ -919,9 +910,9 @@ const VillaDetail = () => {
     try {
       // Calculate totalAmount based on individual date pricing
       let totalPrice = 0
-      const daysStay = totalDays || 0
+      const nights = totalNights || 0
 
-      for (let i = 0; i < daysStay; i++) {
+      for (let i = 0; i < nights; i++) {
         const currentDate = new Date(checkInDate)
         currentDate.setDate(currentDate.getDate() + i)
         totalPrice += getPriceForDate(currentDate, villa.name)
@@ -943,10 +934,13 @@ const VillaDetail = () => {
         guestName: userData?.name || userData?.firstName || "Guest",
         checkIn: checkInDate,
         checkOut: checkOutDate,
+        checkInTime,
+        checkOutTime,
         guests: adults + children,
         infants: infants,
         totalAmount: calculatedTotalAmount, // Use the calculated value
-        totalDays: daysStay,
+        totalDays: totalDays,
+        totalNights: nights,
       }
 
       console.log("Booking Data being sent:", bookingData) // Debug log
@@ -1089,6 +1083,9 @@ const VillaDetail = () => {
             }
           }
 
+          if (bookingState.checkInTime) setCheckInTime(bookingState.checkInTime)
+          if (bookingState.checkOutTime) setCheckOutTime(bookingState.checkOutTime)
+
           // Restore guest count
           if (bookingState.adults) setAdults(bookingState.adults)
           if (bookingState.children) setChildren(bookingState.children)
@@ -1131,102 +1128,267 @@ const VillaDetail = () => {
   // Define city variable for breadcrumb
   const city = villa?.location || "Destinations"
 
-  // Animation styles for enhanced UI
-  const animationStyles = `
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
-    }
-    
-    .animate-fadeInUp {
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    .animate-slideInRight {
-      animation: slideInRight 0.6s ease-out forwards;
-    }
-    
-    .animate-pulse {
-      animation: pulse 2s infinite;
-    }
-    
-    .booking-button {
-      transition: all 0.3s ease;
-    }
-    
-    .booking-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-  `
+  // Handle date selection for check-in
+  const handleCheckInDateSelect = (date) => {
+    const dateStr = formatDateToYYYYMMDD(date)
+    setCheckInDate(dateStr)
+    setShowCheckInCalendar(false)
+    setShowCheckInTime(true)
 
-  // Inject animation styles
-  useEffect(() => {
-    const styleSheet = document.createElement("style")
-    styleSheet.textContent = animationStyles
-    document.head.appendChild(styleSheet)
-
-    return () => {
-      if (document.head.contains(styleSheet)) {
-        document.head.removeChild(styleSheet)
-      }
-    }
-  }, [])
-
-  // Keyboard event listener for ESC key to close photo gallery
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape" && showPhotoGallery) {
-        handleClosePhotoGallery()
-      }
-    }
-
-    if (showPhotoGallery) {
-      document.addEventListener("keydown", handleKeyDown)
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = "hidden"
-      document.body.classList.add("modal-open")
+    // Update date range
+    if (checkOutDate && dateStr < checkOutDate) {
+      setDateRange([
+        {
+          startDate: date,
+          endDate: parseYYYYMMDD(checkOutDate),
+          key: "selection",
+        },
+      ])
     } else {
-      // Re-enable body scroll when modal is closed
-      document.body.style.overflow = "unset"
-      document.body.classList.remove("modal-open")
+      setDateRange([
+        {
+          startDate: date,
+          endDate: null,
+          key: "selection",
+        },
+      ])
+      setCheckOutDate("")
     }
+  }
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown)
-      // Cleanup: always re-enable body scroll
-      document.body.style.overflow = "unset"
-      document.body.classList.remove("modal-open")
+  // Handle date selection for check-out
+  const handleCheckOutDateSelect = (date) => {
+    const dateStr = formatDateToYYYYMMDD(date)
+    if (checkInDate && dateStr > checkInDate) {
+      setCheckOutDate(dateStr)
+      setShowCheckOutCalendar(false)
+      setShowCheckOutTime(true)
+
+      // Update date range
+      setDateRange([
+        {
+          startDate: parseYYYYMMDD(checkInDate),
+          endDate: date,
+          key: "selection",
+        },
+      ])
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Date",
+        text: "Check-out date must be after check-in date.",
+        confirmButtonColor: "#16a34a",
+      })
     }
-  }, [showPhotoGallery])
+  }
 
-  // Show loading state
+  // Time options
+  const timeOptions = [
+    "12:00 AM",
+    "12:30 AM",
+    "1:00 AM",
+    "1:30 AM",
+    "2:00 AM",
+    "2:30 AM",
+    "3:00 AM",
+    "3:30 AM",
+    "4:00 AM",
+    "4:30 AM",
+    "5:00 AM",
+    "5:30 AM",
+    "6:00 AM",
+    "6:30 AM",
+    "7:00 AM",
+    "7:30 AM",
+    "8:00 AM",
+    "8:30 AM",
+    "9:00 AM",
+    "9:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "12:00 PM",
+    "12:30 PM",
+    "1:00 PM",
+    "1:30 PM",
+    "2:00 PM",
+    "2:30 PM",
+    "3:00 PM",
+    "3:30 PM",
+    "4:00 PM",
+    "4:30 PM",
+    "5:00 PM",
+    "5:30 PM",
+    "6:00 PM",
+    "6:30 PM",
+    "7:00 PM",
+    "7:30 PM",
+    "8:00 PM",
+    "8:30 PM",
+    "9:00 PM",
+    "9:30 PM",
+    "10:00 PM",
+    "10:30 PM",
+    "11:00 PM",
+    "11:30 PM",
+  ]
+
+  // Calendar component
+  const CalendarPopup = ({ isVisible, onClose, onDateSelect, title, selectedDate }) => {
+    if (!isVisible) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="calendar-container">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                onClick={() => {
+                  const newDate = new Date(currentCalendarMonth)
+                  newDate.setMonth(newDate.getMonth() - 1)
+                  setCurrentCalendarMonth(newDate)
+                }}
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-600" />
+              </button>
+              <h4 className="text-lg font-semibold text-gray-900">
+                {currentCalendarMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              </h4>
+              <button
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                onClick={() => {
+                  const newDate = new Date(currentCalendarMonth)
+                  newDate.setMonth(newDate.getMonth() + 1)
+                  setCurrentCalendarMonth(newDate)
+                }}
+              >
+                <ChevronRight className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+              {(() => {
+                const year = currentCalendarMonth.getFullYear()
+                const month = currentCalendarMonth.getMonth()
+                const firstDayOfMonth = new Date(year, month, 1)
+                const startDate = new Date(firstDayOfMonth)
+                startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
+
+                const days = []
+                for (let i = 0; i < 42; i++) {
+                  const currentDate = new Date(startDate)
+                  currentDate.setDate(startDate.getDate() + i)
+                  currentDate.setHours(12, 0, 0, 0)
+                  days.push(currentDate)
+                }
+
+                return days.map((currentDate, index) => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  const isCurrentMonth = currentDate.getMonth() === month
+                  const isToday = currentDate.toDateString() === today.toDateString()
+                  const isPast = currentDate < today && !isToday
+                  const currentDateStr = formatDateToYYYYMMDD(currentDate)
+                  const isSelected = selectedDate === currentDateStr
+                  const price = getPriceForDate(currentDate, villa.name)
+
+                  return (
+                    <div
+                      key={`${currentDate.getTime()}-${index}`}
+                      className={`
+                        relative flex flex-col items-center justify-center rounded-lg cursor-pointer 
+                        min-h-[50px] transition-all duration-200 select-none
+                        ${!isCurrentMonth ? "opacity-40" : ""}
+                        ${
+                          isPast
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : isSelected
+                              ? "bg-blue-600 text-white font-bold shadow-lg"
+                              : isToday
+                                ? "bg-blue-100 text-blue-800 font-semibold"
+                                : "hover:bg-gray-100 hover:scale-105"
+                        }
+                      `}
+                      onClick={() => {
+                        if (isPast || !isCurrentMonth) return
+                        onDateSelect(currentDate)
+                      }}
+                    >
+                      <div className="text-sm font-medium">{currentDate.getDate()}</div>
+                      {isCurrentMonth && !isPast && (
+                        <div className={`text-xs mt-1 ${isSelected ? "text-white" : "text-gray-600"}`}>
+                          {formatPrice(price)}
+                        </div>
+                      )}
+                      {isToday && !isSelected && (
+                        <div className="absolute -bottom-1 w-1 h-1 rounded-full bg-blue-500"></div>
+                      )}
+                    </div>
+                  )
+                })
+              })()}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Time selection popup
+  const TimeSelectionPopup = ({ isVisible, onClose, onTimeSelect, title, selectedTime }) => {
+    if (!isVisible) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl max-h-96 overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2">
+              {timeOptions.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => {
+                    onTimeSelect(time)
+                    onClose()
+                  }}
+                  className={`
+                    p-3 rounded-lg text-sm font-medium transition-all duration-200
+                    ${selectedTime === time ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
+                  `}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -1242,7 +1404,6 @@ const VillaDetail = () => {
     )
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -1259,9 +1420,6 @@ const VillaDetail = () => {
           </div>
           <p className="text-xl text-gray-700 mb-2 font-semibold">Unable to Load Villa Details</p>
           <p className="text-gray-500 mb-6">We encountered a problem while fetching villa data.</p>
-          <div className="bg-gray-50 p-4 rounded-lg text-left mb-6 overflow-auto max-h-32">
-            <p className="text-sm text-red-600 font-mono">{error}</p>
-          </div>
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => navigate("/rooms")}
@@ -2560,200 +2718,51 @@ const VillaDetail = () => {
         </div>
       </div>
 
-      {/* Enhanced CSS Styles */}
-      <style jsx>{`
-        .glass-effect {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-        }
+      {/* Calendar Popups */}
+      <CalendarPopup
+        isVisible={showCheckInCalendar}
+        onClose={() => setShowCheckInCalendar(false)}
+        onDateSelect={handleCheckInDateSelect}
+        title="Select Check-in Date"
+        selectedDate={checkInDate}
+      />
 
-        .gradient-text {
-          background: linear-gradient(135deg, #059669, #0d9488);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
+      <CalendarPopup
+        isVisible={showCheckOutCalendar}
+        onClose={() => setShowCheckOutCalendar(false)}
+        onDateSelect={handleCheckOutDateSelect}
+        title="Select Check-out Date"
+        selectedDate={checkOutDate}
+      />
 
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
+      {/* Time Selection Popups */}
+      <TimeSelectionPopup
+        isVisible={showCheckInTime}
+        onClose={() => setShowCheckInTime(false)}
+        onTimeSelect={setCheckInTime}
+        title="Select Check-in Time"
+        selectedTime={checkInTime}
+      />
 
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
+      <TimeSelectionPopup
+        isVisible={showCheckOutTime}
+        onClose={() => setShowCheckOutTime(false)}
+        onTimeSelect={setCheckOutTime}
+        title="Select Check-out Time"
+        selectedTime={checkOutTime}
+      />
 
-        .animate-slideInDown {
-          animation: slideInDown 0.5s ease-out;
-        }
-
-        @keyframes slideInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slideInLeft {
-          animation: slideInLeft 0.6s ease-out;
-        }
-
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .animate-stagger > * {
-          animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        .animate-stagger > *:nth-child(1) {
-          animation-delay: 0.1s;
-        }
-        .animate-stagger > *:nth-child(2) {
-          animation-delay: 0.2s;
-        }
-        .animate-stagger > *:nth-child(3) {
-          animation-delay: 0.3s;
-        }
-
-        .scroll-animate {
-          opacity: 0;
-          transform: translateY(30px);
-          animation: fadeInUp 0.8s ease-out forwards;
-        }
-
-        .sticky-booking-box {
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .sticky-stepper {
-          position: sticky;
-          top: 0;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          z-index: 10;
-          padding: 1rem 0;
-          margin: -1rem 0 1rem 0;
-          border-radius: 1rem;
-        }
-
-        .booking-form-content {
-          max-height: calc(80vh - 200px);
-          overflow-y: auto;
-          padding-right: 4px;
-        }
-
-        .booking-form-content::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .booking-form-content::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 2px;
-        }
-
-        .booking-form-content::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 2px;
-        }
-
-        .booking-form-content::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-
-        .timeline-step {
-          position: relative;
-        }
-
-        .step-completed {
-          background: linear-gradient(135deg, #059669, #0d9488);
-          color: white;
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
-        }
-
-        .step-active {
-          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-          color: white;
-          transform: scale(1.15);
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
-          animation: pulse 2s infinite;
-        }
-
-        .step-transition {
-          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .timeline-connector {
-          height: 3px;
-          border-radius: 2px;
-        }
-
-        .guest-counter {
-          background: rgba(255, 255, 255, 0.8);
-          border: 1px solid rgba(229, 231, 235, 0.8);
-          transition: all 0.3s ease;
-        }
-
-        .guest-counter:hover {
-          background: rgba(255, 255, 255, 1);
-          border-color: rgba(34, 197, 94, 0.3);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-calendar {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-
-        .touch-manipulation {
-          touch-action: manipulation;
-        }
-
-        @media (max-width: 640px) {
-          .booking-form-content {
-            max-height: none;
-            overflow-y: visible;
-          }
-
-          .sticky-booking-box {
-            position: relative;
-            max-height: none;
-            overflow-y: visible;
-          }
-
-          .sticky-stepper {
-            position: relative;
-            top: auto;
-          }
-        }
-      `}</style>
+      {/* Photo Gallery */}
+      {showPhotoGallery && (
+        <div className="fixed inset-0 z-50">
+          <PhotoGallery
+            images={villa.images}
+            villaName={villa.name}
+            isOpen={showPhotoGallery}
+            onClose={handleClosePhotoGallery}
+          />
+        </div>
+      )}
     </div>
   )
 }
