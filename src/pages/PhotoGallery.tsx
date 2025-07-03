@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -349,8 +348,28 @@ return () => clearTimeout(timer)
 }
 }, [images])
 
+// Add this effect to clean up body styles when unmounting
+useEffect(() => {
+  // When component mounts, prevent scrolling on the body
+  document.body.style.overflow = 'hidden';
+  
+  // When component unmounts, restore scrolling
+  return () => {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+  };
+}, []);
+
 const handleBackClick = () => {
-navigate(-1) // Go back to previous page
+  // Restore body scroll before navigating
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  
+  navigate(-1) // Go back to previous page
 }
 
 const getGalleryRows = (imgs) => {

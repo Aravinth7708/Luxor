@@ -53,6 +53,12 @@ const App = () => {
   // Scroll to top when route changes
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Ensure body scroll is enabled when routes change
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
   }, [pathname]);
   
   const isOwnerPath = pathname.includes("owner");
