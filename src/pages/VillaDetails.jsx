@@ -1011,9 +1011,11 @@ const VillaDetail = () => {
        
         handler: async function(response) {
           try {
-            console.log("Payment successful:", response);
+            console.log("Payment successful, response from Razorpay:", response);
             
-          
+            // Add more detailed logging
+            console.log("Attempting to verify payment with backend...");
+            
             const verifyResponse = await fetch(`${API_BASE_URL}/api/payments/verify`, {
               method: 'POST',
               headers: {
@@ -1042,13 +1044,23 @@ const VillaDetail = () => {
               })
             });
 
-            const verifyData = await verifyResponse.json();
+            // Log the raw response for debugging
+            const rawResponse = await verifyResponse.text();
+            console.log("Raw verify response:", rawResponse);
+            
+            // Try to parse as JSON
+            let verifyData;
+            try {
+              verifyData = JSON.parse(rawResponse);
+            } catch (parseError) {
+              console.error("Failed to parse verification response:", parseError);
+              throw new Error("Invalid response from server during verification");
+            }
             
             if (verifyResponse.ok && verifyData.success) {
-              // Reset all booking form data
+              // Reset booking form and show success message
               resetBookingForm();
               
-              // Show success message
               Swal.fire({
                 icon: "success",
                 title: "Booking Confirmed! 🎉",
@@ -1063,10 +1075,23 @@ const VillaDetail = () => {
             }
           } catch (error) {
             console.error("Payment verification error:", error);
+            
+            // Log HTTP information if available
+            if (error.response) {
+              console.error("Response status:", error.response.status);
+              console.error("Response headers:", error.response.headers);
+            }
+            
             Swal.fire({
               icon: "warning",
               title: "Payment Verification Issue",
-              text: "Your payment was processed, but we're having trouble confirming it. Our team will contact you shortly.",
+              html: `
+                <div>
+                  <p>Your payment was processed, but we're having trouble confirming it.</p>
+                  <p>Error: ${error.message || "Unknown error"}</p>
+                  <p>Our team will contact you shortly.</p>
+                </div>
+              `,
               confirmButtonColor: "#16a34a",
             });
           } finally {
@@ -2839,18 +2864,6 @@ const VillaDetail = () => {
         title="Select Check-out Time"
         selectedTime={checkOutTime}
       />
-
-      {/* Photo Gallery */}
-      {showPhotoGallery && (
-        <div className="fixed inset-0 z-50">
-          <PhotoGallery
-            images={villa.images}
-            villaName={villa.name}
-            isOpen={showPhotoGallery}
-            onClose={handleClosePhotoGallery}
-          />
-        </div>
-      )}
     </div>
   )
 }
