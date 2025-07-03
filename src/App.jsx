@@ -23,7 +23,7 @@ import SearchResults from './pages/SearchResults';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import SignIn from './pages/SignIn';
 import OTPVerification from './pages/OTPVerification';
-
+import PhotoGallery from './pages/PhotoGallery';
 // Auth Guard Component
 const ProtectedRoute = ({ children }) => {
   const { authToken, loading } = useAuth();
@@ -121,6 +121,7 @@ const App = () => {
             <Route path='/about' element={<About />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/verify-otp" element={<OTPVerification />} />
+               <Route path="/photogallery/:villaname" element={<PhotoGallery />} />
           </Routes>
         </div>
         <Footer />
