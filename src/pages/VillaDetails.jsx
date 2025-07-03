@@ -507,6 +507,11 @@ const VillaDetail = () => {
   const [totalNights, setTotalNights] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
 
+  // Add these new states to the component
+  const [blockedDates, setBlockedDates] = useState([]);
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState(null);
+
   // Helper function to check if date is weekend
   const isWeekend = (date) => {
     const day = date.getDay()
@@ -2474,7 +2479,9 @@ const VillaDetail = () => {
                             </svg>
                             Adults
                           </div>
-                          <div className="text-sm text-gray-500">Age 13+</div>
+                          <div className="text-sm text-gray-500 mb-4">
+                            Age 13+
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
@@ -2506,7 +2513,7 @@ const VillaDetail = () => {
                             <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
-                                d="M10 2a4 4 0 100 8 4 4 0 000-8zM8 14a2 2 0 00-2 2v1a1 1 0 001 1h6a1 1 0 001-1v-1a2 2 0 00-2-2H8z"
+                                d="M10 2a4 4 0 100 8 4 4 0 000-8zM8 14a2 2 0 00-2 2v1a1 1 0 001 1h6a1 1 0 001-1v-1a2 2 0 00-2-2H8zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
                                 clipRule="evenodd"
                               />
                             </svg>
@@ -2777,7 +2784,7 @@ const VillaDetail = () => {
                   </div>
                 )}
 
-                {/* Trust Indicators */}
+            
                 <div className="mt-4 p-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center justify-center gap-4 text-xs text-gray-600">
                     <div className="flex items-center gap-1">
