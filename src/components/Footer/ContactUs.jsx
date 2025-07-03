@@ -907,7 +907,14 @@ export default function Contact() {
                   </motion.div>
                   <div>
                     <motion.h3 className="font-medium text-base sm:text-lg md:text-xl text-gray-800">Phone</motion.h3>
-                    <p className="text-gray-600 text-xs sm:text-sm md:text-base break-all">+91 7904040739</p>
+                    <motion.a 
+                      href="tel:+918015924647"
+                      className="text-gray-600 text-xs sm:text-sm md:text-base break-all hover:text-black hover:underline transition-colors duration-300 cursor-pointer"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      +91 8015924647
+                    </motion.a>
                   </div>
                 </motion.div>
 
@@ -932,9 +939,16 @@ export default function Contact() {
                   </motion.div>
                   <div>
                     <motion.h3 className="font-medium text-base sm:text-lg md:text-xl text-gray-800">Email</motion.h3>
-                    <p className="text-gray-600 text-xs sm:text-sm md:text-base break-all">
+                    <motion.a 
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=luxorholidayhomestays@gmail.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 text-xs sm:text-sm md:text-base break-all hover:text-black hover:underline transition-colors duration-300 cursor-pointer"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       luxorholidayhomestays@gmail.com
-                    </p>
+                    </motion.a>
                   </div>
                 </motion.div>
 
@@ -959,9 +973,16 @@ export default function Contact() {
                   </motion.div>
                   <div>
                     <motion.h3 className="font-medium text-base sm:text-lg md:text-xl text-gray-800">Address</motion.h3>
-                    <p className="text-gray-600 text-xs sm:text-sm md:text-base break-all">
+                    <motion.a 
+                      href="https://www.google.com/maps/search/?api=1&query=40/2B+Kovalam+main+road,+Chennai,+603112"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 text-xs sm:text-sm md:text-base break-all hover:text-black hover:underline transition-colors duration-300 cursor-pointer"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       40/2B Kovalam main road, Chennai, 603112
-                    </p>
+                    </motion.a>
                   </div>
                 </motion.div>
               </motion.div>

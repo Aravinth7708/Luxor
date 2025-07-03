@@ -70,9 +70,9 @@ const Home = () => {
   
         <Hero/>
         <FeaturedDestination />
-        <ExclusiveOffers />
+        {/* <ExclusiveOffers />
         <LuxuryVillaFeatures />
-        <Testimonial />
+        <Testimonial /> */}
         <NewsLetter />
     </>
   )
