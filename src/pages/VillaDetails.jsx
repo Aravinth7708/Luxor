@@ -443,6 +443,16 @@ const facilityIconMap = {
   General: Home,
 }
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const VillaDetail = () => {
   const { id } = useParams()
   const location = useLocation()
@@ -480,6 +490,7 @@ const VillaDetail = () => {
   const isSignedIn = !!authToken && !!userData // Update isSignedIn check based on authToken
   const navigate = useNavigate()
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [paymentProcessing, setPaymentProcessing] = useState(false)
   const isBookingInProgress = useRef(false)
 
   // Date range picker state
@@ -833,18 +844,18 @@ const VillaDetail = () => {
     isBookingInProgress.current = false
   }
 
-  // Enhanced handleBookNow function to fix totalAmount issue
+  // Fix the handleBookNow function in VillaDetails.jsx
   const handleBookNow = async () => {
     // Debug: Log authentication state
     console.log("Authentication State:", {
       isSignedIn,
       userData,
       hasAuthToken: !!authToken,
-    })
+    });
 
     // Prevent duplicate bookings
-    if (bookingLoading || isBookingInProgress.current) {
-      return
+    if (bookingLoading || isBookingInProgress.current || paymentProcessing) {
+      return;
     }
 
     if (!isSignedIn) {
@@ -865,10 +876,10 @@ const VillaDetail = () => {
         bookingStep,
         // Include the current URL to return to this exact page
         returnUrl: window.location.pathname + window.location.search,
-      }
+      };
 
       // Save to localStorage
-      localStorage.setItem("pendingBooking", JSON.stringify(bookingState))
+      localStorage.setItem("pendingBooking", JSON.stringify(bookingState));
 
       Swal.fire({
         icon: "info",
@@ -876,10 +887,10 @@ const VillaDetail = () => {
         text: "Please log in to book this villa. We'll save your booking details.",
         confirmButtonColor: "#16a34a",
       }).then(() => {
-        navigate("/sign-in?redirect=booking")
-      })
+        navigate("/sign-in?redirect=booking");
+      });
 
-      return
+      return;
     }
 
     if (!checkInDate || !checkOutDate) {
@@ -888,11 +899,11 @@ const VillaDetail = () => {
         title: "Missing Dates",
         text: "Please select check-in and check-out dates.",
         confirmButtonColor: "#16a34a",
-      })
-      return
+      });
+      return;
     }
 
-    const villaId = villa._id || villa.id
+    const villaId = villa._id || villa.id;
 
     if (!villaId || villaId.length < 12) {
       Swal.fire({
@@ -900,158 +911,226 @@ const VillaDetail = () => {
         title: "Invalid Villa",
         text: "Invalid villa. Please try again from the main villa list.",
         confirmButtonColor: "#16a34a",
-      })
-      return
+      });
+      return;
     }
 
-    setBookingLoading(true)
-    isBookingInProgress.current = true
+    setBookingLoading(true);
+    isBookingInProgress.current = true;
 
     try {
       // Calculate totalAmount based on individual date pricing
-      let totalPrice = 0
-      const nights = totalNights || 0
+      let totalPrice = 0;
+      const nights = totalNights || totalDays - 1;
 
       for (let i = 0; i < nights; i++) {
-        const currentDate = new Date(checkInDate)
-        currentDate.setDate(currentDate.getDate() + i)
-        totalPrice += getPriceForDate(currentDate, villa.name)
+        const currentDate = new Date(checkInDate);
+        currentDate.setDate(currentDate.getDate() + i);
+        totalPrice += getPriceForDate(currentDate, villa.name);
       }
 
-      const serviceFee = Math.round(totalPrice * 0.05)
-      const taxAmount = Math.round((totalPrice + serviceFee) * 0.18)
-      const calculatedTotalAmount = Math.round(totalPrice + serviceFee + taxAmount)
+      const serviceFee = Math.round(totalPrice * 0.05);
+      const taxAmount = Math.round((totalPrice + serviceFee) * 0.18);
+      const calculatedTotalAmount = Math.round(totalPrice + serviceFee + taxAmount);
 
       // Check if calculated amount is valid
       if (isNaN(calculatedTotalAmount) || calculatedTotalAmount <= 0) {
-        throw new Error("Invalid booking amount. Please try again with valid dates.")
+        throw new Error("Invalid booking amount. Please try again with valid dates.");
       }
 
-      const bookingData = {
-        villaId,
-        villaName: villa.name,
-        email: userData?.email,
-        guestName: userData?.name || userData?.firstName || "Guest",
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        checkInTime,
-        checkOutTime,
-        guests: adults + children,
-        infants: infants,
-        totalAmount: calculatedTotalAmount, // Use the calculated value
-        totalDays: totalDays,
-        totalNights: nights,
+      console.log("Creating payment order with amount:", calculatedTotalAmount);
+
+      // Load Razorpay script first
+      setPaymentProcessing(true);
+      const isScriptLoaded = await loadRazorpayScript();
+      
+      if (!isScriptLoaded) {
+        throw new Error("Failed to load payment gateway. Please refresh and try again.");
       }
 
-      console.log("Booking Data being sent:", bookingData) // Debug log
-      console.log("API URL:", `${API_BASE_URL}/api/bookings/create`) // Debug log
-
-      // Check authentication
-      if (!userData || !authToken) {
-        console.log("No authentication data available") // Debug log
-        Swal.fire({
-          icon: "warning",
-          title: "Authentication Required",
-          text: "Please log in to complete your booking.",
-          confirmButtonColor: "#16a34a",
-        }).then(() => {
-          navigate("/sign-in")
+      // Create order on the server
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const orderResponse = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          amount: calculatedTotalAmount,
+          currency: 'INR',
+          villaName: villa.name,
+          villaId: villa._id || villa.id,
+          guestName: userData?.name || userData?.firstName || "Guest",
+          email: userData?.email,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          checkInTime,
+          checkOutTime,
+          guests: adults + children,
+          infants,
+          totalDays,
+          totalNights: nights
         })
-        setBookingLoading(false)
-        isBookingInProgress.current = false
-        return
+      });
+
+      // Log the raw response for debugging
+      const rawResponse = await orderResponse.text();
+      console.log("Raw order response:", rawResponse);
+      
+      // Parse the response as JSON (separately, after logging the raw text)
+      let orderData;
+      try {
+        orderData = JSON.parse(rawResponse);
+      } catch (parseError) {
+        console.error("Failed to parse order response:", parseError);
+        throw new Error("Invalid response from server. Please try again later.");
       }
 
-      // Prepare headers with auth token
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
+      if (!orderData.success || !orderData.order || !orderData.order.id) {
+        console.error("Invalid order data:", orderData);
+        throw new Error("Unable to create payment order. Please try again.");
       }
 
-      console.log("Using auth token for booking request") // Debug log
+      console.log("Order created successfully:", orderData);
 
-      const response = await fetch(`${API_BASE_URL}/api/bookings/create`, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(bookingData),
-      })
+      // Razorpay options
+      const options = {
+        // Use the correct key from your backend
+        key: import.meta.env.VITE_RAZORPAY_KEY || "rzp_live_quNHH9YfEhaAru", // Use env var with fallback
+        amount: orderData.order.amount, 
+        currency: orderData.order.currency || "INR",
+        name: "LuxorStay",
+        description: `Booking for ${villa.name}`,
+        order_id: orderData.order.id,
+       
+        handler: async function(response) {
+          try {
+            console.log("Payment successful:", response);
+            
+          
+            const verifyResponse = await fetch(`${API_BASE_URL}/api/payments/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                bookingData: {
+                  villaId: villa._id || villa.id,
+                  villaName: villa.name,
+                  email: userData?.email,
+                  guestName: userData?.name || userData?.firstName || "Guest",
+                  checkIn: checkInDate,
+                  checkOut: checkOutDate,
+                  checkInTime,
+                  checkOutTime,
+                  guests: adults + children,
+                  infants,
+                  totalAmount: calculatedTotalAmount,
+                  totalDays,
+                  totalNights: nights,
+                }
+              })
+            });
 
-      console.log("Raw Response:", response) // Debug log
-      console.log("Response status:", response.status) // Debug log
-      console.log("Response headers:", Object.fromEntries(response.headers.entries())) // Debug log
+            const verifyData = await verifyResponse.json();
+            
+            if (verifyResponse.ok && verifyData.success) {
+              // Reset all booking form data
+              resetBookingForm();
+              
+              // Show success message
+              Swal.fire({
+                icon: "success",
+                title: "Booking Confirmed! 🎉",
+                text: "Your payment was successful and booking has been confirmed!",
+                confirmButtonColor: "#16a34a",
+                confirmButtonText: "View My Bookings",
+              }).then(() => {
+                navigate("/my-bookings", { replace: true });
+              });
+            } else {
+              throw new Error(verifyData.message || "Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            Swal.fire({
+              icon: "warning",
+              title: "Payment Verification Issue",
+              text: "Your payment was processed, but we're having trouble confirming it. Our team will contact you shortly.",
+              confirmButtonColor: "#16a34a",
+            });
+          } finally {
+            setPaymentProcessing(false);
+            setBookingLoading(false);
+            isBookingInProgress.current = false;
+          }
+        },
+        // Add proper error callbacks
+        modal: {
+          ondismiss: function() {
+            console.log("Payment modal closed by user");
+            setPaymentProcessing(false);
+            setBookingLoading(false);
+            isBookingInProgress.current = false;
+          },
+          escape: false,
+          animation: true
+        },
+        prefill: {
+          name: userData?.name || "",
+          email: userData?.email || "",
+          contact: userData?.phone || ""
+        }
+      };
 
-      const data = await response.json()
+      // Also, add these Razorpay callbacks to catch errors
+      options.on = {
+        payment: {
+          failed: function(response) {
+            console.error("Payment failed:", response.error);
+            Swal.fire({
+              icon: "error",
+              title: "Payment Failed",
+              text: response.error.description || "Your payment could not be processed. Please try again.",
+              confirmButtonColor: "#16a34a",
+            });
+            setPaymentProcessing(false);
+            setBookingLoading(false);
+            isBookingInProgress.current = false;
+          }
+        }
+      };
 
-      console.log("Booking API Response:", {
-        ok: response.ok,
-        status: response.status,
-        data: data,
-      }) // Enhanced debug log
+      // Open Razorpay payment form
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
 
-      if (response.ok && data.success) {
-        console.log("Booking successful, starting redirect process...") // Debug log
-        // Reset all booking form data immediately
-        resetBookingForm()
-
-        // Show success message
-        Swal.fire({
-          icon: "success",
-          title: "Booking Confirmed! 🎉",
-          text: "Your booking has been successfully confirmed!",
-          confirmButtonColor: "#16a34a",
-          confirmButtonText: "Go to Homepage",
-        }).then(() => {
-          console.log("User clicked OK, redirecting...") // Debug log
-          // Simple redirect - just navigate to homepage
-          navigate("/", { replace: true })
-        })
-      } else {
-        console.error("Booking failed:", {
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-        }) // Enhanced error log
-
-        Swal.fire({
-          icon: "error",
-          title: "Booking Failed",
-          html: `
-            <div>
-              <p>${data.error || data.message || "Booking failed. Please try again."}</p>
-              <br>
-              <small style="color: #666;">
-                Error Code: ${response.status}<br>
-                ${data.details ? `Details: ${data.details}` : ""}
-              </small>
-            </div>
-          `,
-          confirmButtonColor: "#16a34a",
-        })
-
-        setBookingLoading(false)
-        isBookingInProgress.current = false
-      }
     } catch (err) {
-      console.error("Booking error caught:", err) // Enhanced error log
+      console.error("Payment or booking error:", err);
 
       Swal.fire({
         icon: "error",
         title: "Booking Failed",
         html: `
           <div>
-            <p>Network error or server is unavailable.</p>
+            <p>${err.message || "There was a problem processing your booking."}</p>
             <br>
             <small style="color: #666;">
-              Error: ${err.message}<br>
               Please check your internet connection and try again.
             </small>
           </div>
         `,
         confirmButtonColor: "#16a34a",
-      })
+      });
 
-      setBookingLoading(false)
-      isBookingInProgress.current = false
+      setPaymentProcessing(false);
+      setBookingLoading(false);
+      isBookingInProgress.current = false;
     }
   }
 
@@ -1615,7 +1694,7 @@ const VillaDetail = () => {
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center transition-all duration-300 group-hover:bg-black/40">
                     <div className="text-white text-center">
                       <div className="text-2xl font-bold mb-1">+{villa.images.length - 5}</div>
-                      <div className="text-sm opacity-90">More Photos</div>
+                      <div className="text-sm opacity-90">More Photos                   </div>
                     </div>
                   </div>
                 )}
@@ -1623,6 +1702,7 @@ const VillaDetail = () => {
             ))}
           </div>
         </div>
+           
 
         {/* View All Photos Button - Enhanced */}
         <button
@@ -1634,7 +1714,7 @@ const VillaDetail = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              d="M4 16l4.586-4.586a2 2  0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
           View All {villa.images.length} Photos
@@ -2095,7 +2175,7 @@ const VillaDetail = () => {
                       <div className="bg-white border-2 border-gray-200 rounded-xl p-3 sm:p-4 hover:border-green-300 transition-all duration-300 min-h-[4rem] touch-manipulation">
                         <div className="text-xs text-gray-500 mb-1 font-medium">Check-out</div>
                         <div className="font-semibold text-gray-800 flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-green-600" />
+                          <Calendar className="h-4 w-4 mr-2 text-green-600 flex-shrink-0" />
                           {checkOutDate ? (
                             <div className="flex flex-col">
                               <span className="text-green-700 text-sm">
@@ -2280,7 +2360,7 @@ const VillaDetail = () => {
                                     <div
                                       className={`text-xs mt-1 ${isCheckIn || isCheckOut ? "text-white" : "text-gray-600"}`}
                                     >
-                                      {formatPrice(datePrice)}
+                                      {formatPrice(price)}
                                     </div>
                                   )}
 
@@ -2323,7 +2403,7 @@ const VillaDetail = () => {
 
                         {/* Selected Dates Summary - Enhanced Design */}
                         {checkInDate && checkOutDate && (
-                          <div className="mt-4 pt-3 border-t border-gray-100 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 shadow-inner">
+                          <div className="mt-4 pt-3 border-t border-green-200 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 shadow-inner">
                             <div className="flex items-center justify-between text-sm mb-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 bg-gradient-to-br from-green-500 to-green-600 rounded-full"></div>
@@ -2371,7 +2451,7 @@ const VillaDetail = () => {
                     <div className="bg-green-50 rounded-xl p-4 border border-green-100">
                       <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                         <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13 6a3 3 0  11-6 0 016 0zM18  8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                          <path d="M13 6a3 3 0  11-6 0 016 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                         </svg>
                         How many guests?
                       </h4>
@@ -2430,7 +2510,9 @@ const VillaDetail = () => {
                             </svg>
                             Children
                           </div>
-                          <div className="text-sm text-gray-500">Age 3–12</div>
+                          <div className="text-sm text-gray-500 mb-4">
+                            Age 3–12
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <button
@@ -2651,22 +2733,22 @@ const VillaDetail = () => {
                     <div className="space-y-3">
                       <button
                         onClick={handleBookNow}
-                        disabled={bookingLoading || !checkInDate || !checkOutDate}
+                        disabled={bookingLoading || paymentProcessing || !checkInDate || !checkOutDate}
                         className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl booking-button disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {bookingLoading ? (
+                        {bookingLoading || paymentProcessing ? (
                           <div className="flex items-center justify-center">
                             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                            Processing...
+                            {paymentProcessing ? "Processing Payment..." : "Processing..."}
                           </div>
                         ) : (
-                          "Confirm Booking"
+                          "Pay & Confirm ₹" + totalAmount.toLocaleString()
                         )}
                       </button>
                       <button
                         onClick={() => setBookingStep(2)}
                         className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300"
-                        disabled={bookingLoading}
+                        disabled={bookingLoading || paymentProcessing}
                       >
                         Back to Guests
                       </button>
@@ -2732,7 +2814,6 @@ const VillaDetail = () => {
         onClose={() => setShowCheckOutCalendar(false)}
         onDateSelect={handleCheckOutDateSelect}
         title="Select Check-out Date"
-        selectedDate={checkOutDate}
       />
 
       {/* Time Selection Popups */}
