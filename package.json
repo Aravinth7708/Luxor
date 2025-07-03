@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/sitemap-generator.js",
+    "generate-sitemap": "node scripts/sitemap-generator.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,6 +21,7 @@
     "firebase": "^11.10.0",
     "framer-motion": "^12.16.0",
     "lucide-react": "^0.509.0",
+    "next-sitemap": "^4.2.3",
     "react": "^19.0.0",
     "react-countup": "^6.5.3",
     "react-date-range": "^2.0.1",

@@ -1,11 +1,16 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { PlayCircle, PauseCircle, X, ZoomIn, ChevronLeft, ChevronRight, Info, Image, Camera, Heart } from 'lucide-react';
-import villaImage from '../../assets/About/advantages-of-living-in-a-villa.jpg';
+import { PlayCircle, PauseCircle, X, ZoomIn, ChevronLeft, ChevronRight, Image, Camera, Heart } from 'lucide-react';
 import villaVideo from '../../assets/About/v.mp4';
+import SEOHead from '../SEO/SEOHead';
 
 const Gallery = () => {
+  // SEO Configuration for Gallery page
+  const galleryTitle = "Luxury Villa Gallery | Luxor Holiday Home Stays Premium Collection";
+  const galleryDescription = "Explore our premium collection of luxury villas in Chennai and Pondicherry. Browse high-quality images of Luxor Holiday Home Stays' exclusive properties with private pools, beachfront views, and premium amenities.";
+  const galleryKeywords = "luxor gallery, luxor holiday gallery, luxor stay photos, luxor holiday homestays gallery, luxury villas, villa photos, chennai villas, pondicherry villas";
+  
   // State management
   const [isInView, setIsInView] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -13,7 +18,7 @@ const Gallery = () => {
   const [playingStates, setPlayingStates] = useState({});
   const [filterCategory, setFilterCategory] = useState('all');
   const [hoveredItem, setHoveredItem] = useState(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  //  // const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Unused state removed// Uncomment if needed for mouse interactions
   const [scrollY, setScrollY] = useState(0);
   
   // Refs for element access
@@ -378,15 +383,10 @@ const Gallery = () => {
     // }
   };
   
-  // Track mouse position for hover effects
-  const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
+  // Track mouse position for hover effects - simplified to avoid unused state
+  const handleMouseMove = () => {
+    // Mouse tracking functionality removed to simplify component
+    // This function is kept to prevent errors with the onMouseMove prop
   };
   
   // Open fullscreen modal for item
@@ -550,6 +550,14 @@ const Gallery = () => {
 
   return (
     <>
+      {/* SEO Component */}
+      <SEOHead 
+        title={galleryTitle}
+        description={galleryDescription}
+        keywords={galleryKeywords}
+        ogImage="/AmrithPalace/AP2.jpg"
+      />
+      
       {/* CRT overlay effect for videos */}
       <div 
         ref={crtOverlayRef} 
