@@ -3,6 +3,8 @@ import { useState } from "react"
 import { Calendar, Plus, Minus, Check, Shield, Heart, ChevronRight, Users, CreditCard, Clock } from "lucide-react"
 import UnifiedCalendar from "../VillaDetail/unified-calender.jsx"
 import { getVillaPricing, getPriceForDate } from "../../data/villa-pricing.jsx"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 export default function EnhancedBookingForm({
   villa,
@@ -150,6 +152,10 @@ export default function EnhancedBookingForm({
 
   // Enhanced booking handler with time data
   const handleBookNowWithTime = () => {
+    if (!isRangeAvailable(checkInDate, checkOutDate)) {
+      alert("Selected dates are not available. Please choose different dates.");
+      return;
+    }
     const bookingData = {
       checkInTime,
       checkOutTime,
@@ -165,6 +171,12 @@ export default function EnhancedBookingForm({
 
   const totalAmount = calculateTotalAmount()
   const basePrice = calculateBasePrice()
+
+  // Check if the selected date range is available
+  function isRangeAvailable(start, end) {
+    const dates = getDatesBetween(start, end);
+    return dates.every(d => !blockedDatesSet.has(d.toDateString()));
+  }
 
   return (
     <div
@@ -443,10 +455,6 @@ export default function EnhancedBookingForm({
                     <span className="font-medium text-xs">{checkInTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Check-out:</span>
-                    <span className="font-medium text-xs">{checkOutTime}</span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-gray-600">Guests:</span>
                     <span className="font-medium text-xs">
                       {adults + children} Adults/Children{infants > 0 ? `, ${infants} Infants` : ""}
@@ -500,6 +508,10 @@ export default function EnhancedBookingForm({
                 if (!checkInDate || !checkOutDate) {
                   alert("Please select both check-in and check-out dates.")
                   return
+                }
+                if (!isRangeAvailable(checkInDate, checkOutDate)) {
+                  alert("Selected dates are not available. Please choose different dates.");
+                  return;
                 }
                 setBookingStep(2)
               }}

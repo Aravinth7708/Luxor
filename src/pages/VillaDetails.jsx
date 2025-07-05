@@ -174,6 +174,9 @@ export default function VillaDetails() {
   const [activeSection, setActiveSection] = useState("overview")
   const [showAllAmenities, setShowAllAmenities] = useState(false)
 
+  // Blocked date ranges for the villa
+  const [blockedRanges, setBlockedRanges] = useState([])
+
   // Fetch villa details
   const fetchVillaDetails = async () => {
     try {
@@ -542,6 +545,16 @@ export default function VillaDetails() {
       fetchVillaDetails()
     }
   }, [id, location.state])
+
+  // Fetch blocked date ranges when villa ID is available
+  useEffect(() => {
+    if (!villa?._id) return
+    fetch(`${API_BASE_URL}/api/bookings/check-availability?villaId=${villa._id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setBlockedRanges(data.blockedDates || [])
+      })
+  }, [villa?._id])
 
   // Loading state
   if (loading) {
